@@ -305,17 +305,6 @@ void setup(void)
 void loop(void)
 {
 
-  //  //readings every second
-  //  if ((millis() - lastTime) > accelReadDelay) {
-  //    Serial.println(" back to loop ");
-  //    accelRead();
-  //    lastTime = millis();
-  //  }
-
-  //  if (accel_z > 9) {
-  //    sleep(millis());        // call millis() and pass it to the sleep function.  On wake-up, millis will start at 0 again.
-  //  }
-
   if (lsm6ds33.awake())
   {
     Serial.println(" Motion detected ");
