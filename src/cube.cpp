@@ -69,71 +69,90 @@ void sendDataToDevice()
 void sleep(unsigned long time)
 {
   Serial.println(" going to sleep in 5 s ");
-  activeWall = "S";
-  while (accel_z > 9)
+  //activeWall = "S";
+
+  if (activeWall == "S")
   {
+    //go into deep sleep
 
-    //    if ((millis() - lastTime) > accelReadDelay) {
-    //      Serial.println(" in while ");
-    accelRead();
-
-    //      lastTime = millis();
-    //    }
-
-    // shutdown when time reaches SLEEPING_DELAY ms
-    if (((millis() - time) > SLEEPING_DELAY))
+    while (accel_z > 9)
     {
-      Serial.println(" go zzz");
-      delay(100);
 
-      // to reduce power consumption when sleeping, turn off all your LEDs (and other power hungry devices)
-      digitalWrite(LED_BUILTIN, LOW);
-      //Bluefruit.autoConnLed(false);
-      // setup your wake-up pins.
-      //pinMode(WAKE_LOW_PIN,  INPUT_PULLUP_SENSE);
-      pinMode(WAKE_HIGH_PIN, INPUT_PULLDOWN_SENSE);
+      //    if ((millis() - lastTime) > accelReadDelay) {
+      //      Serial.println(" in while ");
+      accelRead();
 
-      calculateTime();
-      activeWall = "";
+      //      lastTime = millis();
+      //    }
 
-      //      framWriteDate();
-      //      framWriteActStart();
-      //      framWriteDuration();
-      writeDataToFram(startOfActDate, startOfActTime, activityDuration);
+      // shutdown when time reaches SLEEPING_DELAY ms
+      if (((millis() - time) > SLEEPING_DELAY))
+      {
+        Serial.println(" go zzz");
+        delay(100);
 
-      delay(1000);
-      Serial.println(startOfActDate + "\n");
-      Serial.println(startOfActTime + "\n");
-      char buff[] = "hh:mm:ss";
-      Serial.println(activityDuration.toString(buff));
+        // to reduce power consumption when sleeping, turn off all your LEDs (and other power hungry devices)
+        digitalWrite(LED_BUILTIN, LOW);
+        //Bluefruit.autoConnLed(false);
+        // setup your wake-up pins.
+        //pinMode(WAKE_LOW_PIN,  INPUT_PULLUP_SENSE);
+        pinMode(WAKE_HIGH_PIN, INPUT_PULLDOWN_SENSE);
 
-      //showFram();
+        calculateTime();
+        activeWall = "";
 
-      showFram();
+        //      framWriteDate();
+        //      framWriteActStart();
+        //      framWriteDuration();
+        writeDataToFram(startOfActDate, startOfActTime, activityDuration);
 
-      Serial.println("\n");
-      String readDate = framReadDate();
-      Serial.println("Date: " + readDate + "\n");
+        delay(1000);
+        Serial.println(startOfActDate + "\n");
+        Serial.println(startOfActTime + "\n");
+        char buff[] = "hh:mm:ss";
+        Serial.println(activityDuration.toString(buff));
 
-      String readTime = framReadActStart();
-      Serial.println("Time: " + readTime + "\n");
+        //showFram();
 
-      String readDur = framReadDuration();
-      Serial.println("Duration: " + readDur + "\n");
+        showFram();
 
-      //       Serial.println("wczytany string z pamięci \n");
-      //
-      //       String s = framReadDate(addr);
-      //
-      //       Serial.println(s);
+        Serial.println("\n");
+        String readDate = framReadDate();
+        Serial.println("Date: " + readDate + "\n");
 
-      /*
+        String readTime = framReadActStart();
+        Serial.println("Time: " + readTime + "\n");
+
+        String readDur = framReadDuration();
+        Serial.println("Duration: " + readDur + "\n");
+
+        /*
          this function puts the whole nRF52 to deep sleep (no Bluetooth).
          If no sense pins are setup (or other hardware interrupts), the nrf52 will not wake up.
       */
-      delay(300);
+        Serial.println("deep sleep");
+        delay(300);
 
-      sd_power_system_off(); // power down nrf52
+        sd_power_system_off(); // power down nrf52
+      }
+    }
+  }
+  else
+  { //go to sleep after starting counting
+    while (!lsm6ds33.awake())
+    {
+      if (((millis() - time) > SLEEPING_DELAY))
+      {
+        digitalWrite(LED_BUILTIN, LOW);
+        delay(500);
+        digitalWrite(LED_BUILTIN, HIGH);
+        delay(500);
+        digitalWrite(LED_BUILTIN, LOW);
+        Serial.println("light sleep");
+        delay(500);
+        pinMode(WAKE_HIGH_PIN, INPUT_PULLDOWN_SENSE);
+        sd_power_system_off(); // power down nrf52
+      }
     }
   }
 }
@@ -251,11 +270,11 @@ void setup(void)
 
   digitalWrite(LED_BUILTIN, HIGH);
   delay(500);
-  digitalWrite(LED_BUILTIN, LOW);
-  delay(500);
-  digitalWrite(LED_BUILTIN, HIGH);
-  delay(500);
-  digitalWrite(LED_BUILTIN, LOW);
+  // digitalWrite(LED_BUILTIN, LOW);
+  // delay(500);
+  // digitalWrite(LED_BUILTIN, HIGH);
+  // delay(500);
+  // digitalWrite(LED_BUILTIN, LOW);
 
   //accelerometer setup
   // Set to 2G range and 26 Hz update rate
@@ -313,26 +332,36 @@ void loop(void)
 
     delay(2000);
 
-    delay(500);
     digitalWrite(LED_BUILTIN, LOW);
-    delay(1500);
+    delay(2000);
+
+    digitalWrite(LED_BUILTIN, HIGH);
+
+    delay(100);
 
     accelRead();
 
     if (activeWall.length() == 0)
     {
-      //if cube was asleep
-      //set activeWall for the first time and start counting or go to sleep
+      //if cube was in deep sleep
+      //set activeWall for the first time and start counting or go to sleep if it is "S" wall
       setActiveWall();
+      Serial.println("active wall after deep sleep: " + activeWall);
       delay(100);
       startCounting();
+      Serial.println(startOfActDate);
+      Serial.println(startOfActTime);
+      sleep(millis());
     }
     else
     {
       //if cube was active but wall was changed
       //check if wall is the same as previous
+
       String previousWall = activeWall;
+      Serial.println("previous active wall after position change:" + previousWall);
       setActiveWall();
+      Serial.println("new active wall after position change:" + activeWall);
       delay(100);
       if (activeWall != previousWall /*&& (previousWall != "S")*/)
       {
@@ -341,7 +370,7 @@ void loop(void)
 
         calculateTime();
         writeDataToFram(startOfActDate, startOfActTime, activityDuration);
-        sendDataToDevice();
+        //sendDataToDevice();
         startCounting();
       }
     }

@@ -40,6 +40,7 @@ void framWriteDate(String startOfActDate)
         fram.write8(writeToAddr, startOfActDate[i]);
         fram.writeEnable(false);
     }
+    Serial.println("wrote date to fram");
 }
 
 /*
@@ -66,6 +67,7 @@ void framWriteActStart(String startOfActTime)
         fram.write8(writeToAddr, startOfActTime[i]);
         fram.writeEnable(false);
     }
+    Serial.println("wrote act start to fram");
 }
 
 /*
@@ -96,6 +98,7 @@ void framWriteDuration(DateTime activityDuration)
         fram.write8(writeToAddr, buff[i]);
         fram.writeEnable(false);
     }
+    Serial.println("wrote duration to fram");
 }
 
 /*********************************************READ*****FROM******FRAM**********************8**********************************/
@@ -116,7 +119,7 @@ String framReadDate()
         chardata = fram.read8(a);
         dataout.concat(chardata);
     }
-
+    Serial.println("read date from fram");
     return dataout;
 }
 
@@ -137,7 +140,7 @@ String framReadActStart()
         chardata = fram.read8(a);
         dataout.concat(chardata);
     }
-
+    Serial.println("read act start from fram");
     return dataout;
 }
 
@@ -158,7 +161,7 @@ String framReadDuration()
         chardata = fram.read8(a);
         dataout.concat(chardata);
     }
-
+    Serial.println("read duration from fram");
     return dataout;
 }
 
