@@ -381,16 +381,38 @@ void loop(void)
       Serial.println("new active wall after position change: " + activeWall);
       delay(100);
 
-      if (activeWall != previousWall)
-      { //new activity
+      if (activeWall != previousWall) //new activity
+      {
+        Serial.println("activeWall != previousWall");
+        delay(100);
         if (activeWall == "S")
         {
+          calculateTime();
+          Serial.println(" new S wall - startOfActDate " + startOfActDate);
+          Serial.println(" new S wall - startOfActTime " + startOfActTime);
+          writeDataToFram(startOfActDate, startOfActTime, activityDuration);
+
+          /*
+        TO DO
+        */
+          // if (fram not empty)
+          // {
+          //   sendDataToDevice();
+          // }
+
+          sleep(millis());
         }
         else if (activeWall == "undefined")
         {
         }
         else
         {
+          calculateTime();
+          Serial.println(" new wall - startOfActDate " + startOfActDate);
+          Serial.println(" new wall - startOfActTime " + startOfActTime);
+          writeDataToFram(startOfActDate, startOfActTime, activityDuration);
+          startCounting();
+          sleep(millis());
         }
       }
       else
@@ -398,29 +420,29 @@ void loop(void)
         sleep(millis());
       }
 
-      if (activeWall != previousWall) //check if wall is the same as previous
-      {
+      // if (activeWall != previousWall) //check if wall is the same as previous
+      // {
 
-        //if not save current data and start counting again or go to sleep
+      //   //if not save current data and start counting again or go to sleep
 
-        Serial.println(" if (activeWall != previousWall) ");
+      //   Serial.println(" if (activeWall != previousWall) ");
 
-        calculateTime();
-        Serial.println(" if (activeWall != previousWall) - startOfActDate " + startOfActDate);
-        Serial.println(" if (activeWall != previousWall) - startOfActTime " + startOfActTime);
+      //   calculateTime();
+      //   Serial.println(" if (activeWall != previousWall) - startOfActDate " + startOfActDate);
+      //   Serial.println(" if (activeWall != previousWall) - startOfActTime " + startOfActTime);
 
-        //Serial.println(" if (activeWall != previousWall) - activityDuration " + activityDuration);
+      //   //Serial.println(" if (activeWall != previousWall) - activityDuration " + activityDuration);
 
-        writeDataToFram(startOfActDate, startOfActTime, activityDuration);
-        // //sendDataToDevice();
-        // startCounting();
-        // Serial.println("new active wall is different from previous one after position change:");
-        // sleep(millis());
-      }
-      else //if activeWall is the same as previous continue counting
-      {
-        sleep(millis());
-      }
+      //   writeDataToFram(startOfActDate, startOfActTime, activityDuration);
+      //   // //sendDataToDevice();
+      //   // startCounting();
+      //   // Serial.println("new active wall is different from previous one after position change:");
+      //   // sleep(millis());
+      // }
+      // else //if activeWall is the same as previous continue counting
+      // {
+      //   sleep(millis());
+      // }
     }
   }
   delay(100); // can wait as long as you like!

@@ -19,13 +19,24 @@ extern uint8_t FRAM_MOS;
 
 extern Adafruit_FRAM_SPI fram;
 
-extern uint16_t addr;
+extern uint16_t addrNum;
+extern uint16_t addrNum;
+extern uint16_t addrNum;
+extern uint16_t addrNum;
+
+void framWriteNumber();
+
+void framWriteWall();
 
 void framWriteDate(String startOfActDate);
 
 void framWriteActStart(String startOfActTime);
 
 void framWriteDuration(DateTime activityDuration);
+
+String framReadNumber();
+
+String framReadWall();
 
 String framReadDate();
 
