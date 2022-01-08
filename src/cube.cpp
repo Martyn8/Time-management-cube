@@ -301,6 +301,12 @@ void setup(void)
   if (fram.begin())
   {
     Serial.println("Found SPI FRAM");
+    fram.writeEnable(true);
+    fram.write8(0x0, 0x30);
+    fram.write8(0x1, 0x30);
+    showFram();
+    fram.writeEnable(false);
+    delay(15000);
   }
   else
   {
@@ -390,7 +396,8 @@ void loop(void)
           calculateTime();
           Serial.println(" new S wall - startOfActDate " + startOfActDate);
           Serial.println(" new S wall - startOfActTime " + startOfActTime);
-          writeDataToFram(startOfActDate, startOfActTime, activityDuration);
+
+          writeDataToFram(activeWall, startOfActDate, startOfActTime, activityDuration);
 
           /*
         TO DO
@@ -410,7 +417,17 @@ void loop(void)
           calculateTime();
           Serial.println(" new wall - startOfActDate " + startOfActDate);
           Serial.println(" new wall - startOfActTime " + startOfActTime);
-          writeDataToFram(startOfActDate, startOfActTime, activityDuration);
+          String numOFREcords = framReadNumber();
+          Serial.println("records string: " + numOFREcords);
+          int numOFRecords = numOFREcords.toInt();
+          Serial.println("records int: " + numOFRecords);
+
+          writeDataToFram(activeWall, startOfActDate, startOfActTime, activityDuration);
+          numOFRecords += 1;
+          showFram();
+          delay(15000);
+          framWriteNumber(String(numOFRecords));
+          delay(15000);
           startCounting();
           sleep(millis());
         }
