@@ -30,7 +30,9 @@ void startCounting(void)
   startTime = rtc.now();
 
   startOfActDate = startTime.timestamp(DateTime::TIMESTAMP_DATE);
+  Serial.println("start count - start date: " + startOfActDate);
   startOfActTime = startTime.timestamp(DateTime::TIMESTAMP_TIME);
+  Serial.println("start count - start time: " + startOfActTime);
 }
 
 /*
@@ -41,10 +43,14 @@ void calculateTime(void)
   endTime = rtc.now();
   endOfActTime = endTime.timestamp(DateTime::TIMESTAMP_TIME);
   endOfActDate = endTime.timestamp(DateTime::TIMESTAMP_DATE);
-
+  Serial.println("calculate time - end time: " + endOfActTime);
+  Serial.println("calculate time - end date: " + endOfActDate);
   activityDuration = DateTime(SECONDS_FROM_1970_TO_2000 + (endTime.secondstime() - startTime.secondstime()));
 
   char buff[] = "hh:mm:ss";
+  Serial.print("calculate time - act dur: ");
   Serial.println(activityDuration.toString(buff));
+  String dur = activityDuration.toString(buff);
+  Serial.println("calculate time -  dur: " + dur);
   delay(100);
 }

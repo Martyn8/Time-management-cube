@@ -77,6 +77,7 @@ void framWriteDuration(DateTime activityDuration)
 {
 
     char buff[] = "hh:mm:ss";
+    Serial.print("fram read dur - act dur: ");
     Serial.println(activityDuration.toString(buff));
 
     // Count number of characters in myStr
@@ -135,7 +136,7 @@ String framReadActStart()
 
     int lastaddr = 12 + charlen;
 
-    for (int a = 12; a <= lastaddr; a += 1)
+    for (int a = 12; a < lastaddr; a += 1)
     {
         chardata = fram.read8(a);
         dataout.concat(chardata);
@@ -156,7 +157,7 @@ String framReadDuration()
 
     int lastaddr = 22 + charlen;
 
-    for (int a = 22; a <= lastaddr; a += 1)
+    for (int a = 22; a < lastaddr; a += 1)
     {
         chardata = fram.read8(a);
         dataout.concat(chardata);

@@ -24,7 +24,7 @@
 /*
  * Variable holding the time window before the device is being put in power off mode
  */
-#define SLEEPING_DELAY 5000
+#define SLEEPING_DELAY 10000
 
 /********************************************************Send data**************************************************************/
 
@@ -71,65 +71,56 @@ void sleep(unsigned long time)
   Serial.println(" going to sleep in 5 s ");
   //activeWall = "S";
 
-  if (activeWall == "S")
+  if (activeWall == "S") //go into deep sleep
   {
-    //go into deep sleep
-
+    Serial.println(" go deep zzz in 10s");
     while (accel_z > 9)
     {
 
-      //    if ((millis() - lastTime) > accelReadDelay) {
-      //      Serial.println(" in while ");
-      accelRead();
-
-      //      lastTime = millis();
-      //    }
+      accelRead(); //check if position was changed
 
       // shutdown when time reaches SLEEPING_DELAY ms
       if (((millis() - time) > SLEEPING_DELAY))
       {
-        Serial.println(" go zzz");
+        Serial.println(" go deep zzz");
         delay(100);
 
-        // to reduce power consumption when sleeping, turn off all your LEDs (and other power hungry devices)
+        //   // to reduce power consumption when sleeping, turn off all your LEDs (and other power hungry devices)
         digitalWrite(LED_BUILTIN, LOW);
-        //Bluefruit.autoConnLed(false);
+        Bluefruit.autoConnLed(false);
         // setup your wake-up pins.
-        //pinMode(WAKE_LOW_PIN,  INPUT_PULLUP_SENSE);
+        //   //pinMode(WAKE_LOW_PIN,  INPUT_PULLUP_SENSE);
         pinMode(WAKE_HIGH_PIN, INPUT_PULLDOWN_SENSE);
 
-        calculateTime();
+        //   calculateTime();
         activeWall = "";
 
-        //      framWriteDate();
-        //      framWriteActStart();
-        //      framWriteDuration();
-        writeDataToFram(startOfActDate, startOfActTime, activityDuration);
+        //   writeDataToFram(startOfActDate, startOfActTime, activityDuration);
 
-        delay(1000);
-        Serial.println(startOfActDate + "\n");
-        Serial.println(startOfActTime + "\n");
-        char buff[] = "hh:mm:ss";
-        Serial.println(activityDuration.toString(buff));
+        //   delay(1000);
+        //   Serial.println(startOfActDate + "\n");
+        //   Serial.println(startOfActTime + "\n");
+        //   char buff[] = "hh:mm:ss";
+        //   Serial.println(activityDuration.toString(buff));
 
-        //showFram();
+        //   //showFram();
 
-        showFram();
+        //   showFram();
 
-        Serial.println("\n");
-        String readDate = framReadDate();
-        Serial.println("Date: " + readDate + "\n");
+        //   Serial.println("\n");
+        //   String readDate = framReadDate();
+        //   Serial.println("fromm sleep - Date: " + readDate + "\n");
 
-        String readTime = framReadActStart();
-        Serial.println("Time: " + readTime + "\n");
+        //   String readTime = framReadActStart();
+        //   Serial.println("fromm sleep - Time: " + readTime + "\n");
 
-        String readDur = framReadDuration();
-        Serial.println("Duration: " + readDur + "\n");
+        //   String readDur = framReadDuration();
+        //   Serial.println("fromm sleep - Duration: " + readDur + "\n");
 
-        /*
-         this function puts the whole nRF52 to deep sleep (no Bluetooth).
-         If no sense pins are setup (or other hardware interrupts), the nrf52 will not wake up.
-      */
+        //   /*
+        //    this function puts the whole nRF52 to deep sleep (no Bluetooth).
+        //    If no sense pins are setup (or other hardware interrupts), the nrf52 will not wake up.
+        // */
         Serial.println("deep sleep");
         delay(300);
 
@@ -139,18 +130,20 @@ void sleep(unsigned long time)
   }
   else
   { //go to sleep after starting counting
+    Serial.println(" go light zzz in 10s");
     while (!lsm6ds33.awake())
     {
       if (((millis() - time) > SLEEPING_DELAY))
       {
+        Serial.println(" go light zzz");
+        delay(100);
         digitalWrite(LED_BUILTIN, LOW);
         delay(500);
-        digitalWrite(LED_BUILTIN, HIGH);
-        delay(500);
-        digitalWrite(LED_BUILTIN, LOW);
-        Serial.println("light sleep");
-        delay(500);
+
         pinMode(WAKE_HIGH_PIN, INPUT_PULLDOWN_SENSE);
+        delay(100);
+        Serial.println("light sleep");
+        delay(100);
         sd_power_system_off(); // power down nrf52
       }
     }
@@ -192,7 +185,7 @@ void setActiveWall(void)
     activeWall = "S";
     neoPixelShow(activeWall);
     Serial.println("\nThe cube lays on wall " + activeWall + "\n");
-    sleep(millis()); // call millis() and pass it to the sleep function.  On wake-up, millis will start at 0 again.
+    //sleep(millis()); // call millis() and pass it to the sleep function.  On wake-up, millis will start at 0 again.
   }
   else if (accel_z < -9)
   {
@@ -330,70 +323,125 @@ void loop(void)
     delay(100);
     digitalWrite(LED_BUILTIN, HIGH);
 
-    delay(2000);
+    delay(500);
 
     digitalWrite(LED_BUILTIN, LOW);
-    delay(2000);
+    delay(500);
 
     digitalWrite(LED_BUILTIN, HIGH);
 
-    delay(100);
+    delay(10000);
 
     accelRead();
 
     if (activeWall.length() == 0)
     {
-      //if cube was in deep sleep
+      //if cube was in deep sleep (on "S" wall)
       //set activeWall for the first time and start counting or go to sleep if it is "S" wall
+
       setActiveWall();
       Serial.println("active wall after deep sleep: " + activeWall);
       delay(100);
-      startCounting();
-      Serial.println(startOfActDate);
-      Serial.println(startOfActTime);
-      sleep(millis());
+
+      if (activeWall == "S")
+      {
+
+        /*
+        TO DO
+        */
+        // if (fram not empty)
+        // {
+        //   sendDataToDevice();
+        // }
+
+        sleep(millis());
+      }
+      else if (activeWall == "undefined")
+      {
+      }
+      else
+      {
+        startCounting();
+        Serial.println(startOfActDate);
+        delay(100);
+        Serial.println(startOfActTime);
+        delay(100);
+        sleep(millis());
+      }
     }
     else
     {
       //if cube was active but wall was changed
-      //check if wall is the same as previous
 
+      Serial.println("is startOfActDate correct after light sleep : " + startOfActDate);
+      Serial.println("is startOfActTime correct after light sleep : " + startOfActTime);
       String previousWall = activeWall;
-      Serial.println("previous active wall after position change:" + previousWall);
+      Serial.println("previous active wall after position change: " + previousWall);
       setActiveWall();
-      Serial.println("new active wall after position change:" + activeWall);
+      Serial.println("new active wall after position change: " + activeWall);
       delay(100);
-      if (activeWall != previousWall /*&& (previousWall != "S")*/)
+
+      if (activeWall != previousWall)
+      { //new activity
+        if (activeWall == "S")
+        {
+        }
+        else if (activeWall == "undefined")
+        {
+        }
+        else
+        {
+        }
+      }
+      else
+      { //(activeWall == previousWall) same activity
+        sleep(millis());
+      }
+
+      if (activeWall != previousWall) //check if wall is the same as previous
       {
-        //if activeWall is the same as previous continue counting
+
         //if not save current data and start counting again or go to sleep
 
+        Serial.println(" if (activeWall != previousWall) ");
+
         calculateTime();
+        Serial.println(" if (activeWall != previousWall) - startOfActDate " + startOfActDate);
+        Serial.println(" if (activeWall != previousWall) - startOfActTime " + startOfActTime);
+
+        //Serial.println(" if (activeWall != previousWall) - activityDuration " + activityDuration);
+
         writeDataToFram(startOfActDate, startOfActTime, activityDuration);
-        //sendDataToDevice();
-        startCounting();
+        // //sendDataToDevice();
+        // startCounting();
+        // Serial.println("new active wall is different from previous one after position change:");
+        // sleep(millis());
+      }
+      else //if activeWall is the same as previous continue counting
+      {
+        sleep(millis());
       }
     }
   }
   delay(100); // can wait as long as you like!
 
-  // Forward data from HW Serial to BLEUART
-  while (Serial.available())
-  {
-    // Delay to wait for enough input, since we have a limited transmission buffer
-    delay(2);
+  // // Forward data from HW Serial to BLEUART
+  // while (Serial.available())
+  // {
+  //   // Delay to wait for enough input, since we have a limited transmission buffer
+  //   delay(2);
 
-    uint8_t buf[64];
-    int count = Serial.readBytes(buf, sizeof(buf));
+  //   uint8_t buf[64];
+  //   int count = Serial.readBytes(buf, sizeof(buf));
 
-    bleuart.write(buf, count);
-  }
+  //   bleuart.write(buf, count);
+  // }
 
-  // Forward from BLEUART to HW Serial
-  while (bleuart.available())
-  {
-    uint8_t ch;
-    ch = (uint8_t)bleuart.read();
-    Serial.write(ch);
-  }
+  // // Forward from BLEUART to HW Serial
+  // while (bleuart.available())
+  // {
+  //   uint8_t ch;
+  //   ch = (uint8_t)bleuart.read();
+  //   Serial.write(ch);
+  // }
 }
