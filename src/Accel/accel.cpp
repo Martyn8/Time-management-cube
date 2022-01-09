@@ -20,7 +20,6 @@ const unsigned long accelReadDelay = 1000;
 */
 void accelRead(void)
 {
-  delay(1000);
   sensors_event_t accel;
   sensors_event_t gyro;
   sensors_event_t temp;

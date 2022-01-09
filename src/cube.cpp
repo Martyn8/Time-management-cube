@@ -70,6 +70,7 @@ void sleep(unsigned long time)
 {
   Serial.println(" going to sleep in 5 s ");
   //activeWall = "S";
+  Serial.println("function sleep - active wall: " + activeWall);
 
   if (activeWall == "S") //go into deep sleep
   {
@@ -83,7 +84,6 @@ void sleep(unsigned long time)
       if (((millis() - time) > SLEEPING_DELAY))
       {
         Serial.println(" go deep zzz");
-        delay(100);
 
         //   // to reduce power consumption when sleeping, turn off all your LEDs (and other power hungry devices)
         digitalWrite(LED_BUILTIN, LOW);
@@ -121,8 +121,9 @@ void sleep(unsigned long time)
         //    this function puts the whole nRF52 to deep sleep (no Bluetooth).
         //    If no sense pins are setup (or other hardware interrupts), the nrf52 will not wake up.
         // */
+        showFram();
         Serial.println("deep sleep");
-        delay(300);
+        delay(1000);
 
         sd_power_system_off(); // power down nrf52
       }
@@ -136,7 +137,6 @@ void sleep(unsigned long time)
       if (((millis() - time) > SLEEPING_DELAY))
       {
         Serial.println(" go light zzz");
-        delay(100);
         digitalWrite(LED_BUILTIN, LOW);
         delay(500);
 
@@ -262,7 +262,6 @@ void setup(void)
   pinMode(LED_BUILTIN, OUTPUT);
 
   digitalWrite(LED_BUILTIN, HIGH);
-  delay(500);
   // digitalWrite(LED_BUILTIN, LOW);
   // delay(500);
   // digitalWrite(LED_BUILTIN, HIGH);
@@ -302,11 +301,10 @@ void setup(void)
   {
     Serial.println("Found SPI FRAM");
     fram.writeEnable(true);
-    fram.write8(0x0, 0x30);
-    fram.write8(0x1, 0x30);
+    //uint8_t values[2] = {48, 48};
+    //fram.write(1, values, sizeof(values) / sizeof(*values));
     showFram();
     fram.writeEnable(false);
-    delay(15000);
   }
   else
   {
@@ -325,8 +323,9 @@ void loop(void)
 
   if (lsm6ds33.awake())
   {
+    delay(5000);
     Serial.println(" Motion detected ");
-    delay(100);
+
     digitalWrite(LED_BUILTIN, HIGH);
 
     delay(500);
@@ -336,9 +335,9 @@ void loop(void)
 
     digitalWrite(LED_BUILTIN, HIGH);
 
-    delay(10000);
-
     accelRead();
+
+    Serial.println("activeWall after motion: " + activeWall);
 
     if (activeWall.length() == 0)
     {
@@ -347,7 +346,6 @@ void loop(void)
 
       setActiveWall();
       Serial.println("active wall after deep sleep: " + activeWall);
-      delay(100);
 
       if (activeWall == "S")
       {
@@ -368,10 +366,8 @@ void loop(void)
       else
       {
         startCounting();
-        Serial.println(startOfActDate);
-        delay(100);
-        Serial.println(startOfActTime);
-        delay(100);
+        //Serial.println(startOfActDate);
+        //Serial.println(startOfActTime);
         sleep(millis());
       }
     }
@@ -385,12 +381,10 @@ void loop(void)
       Serial.println("previous active wall after position change: " + previousWall);
       setActiveWall();
       Serial.println("new active wall after position change: " + activeWall);
-      delay(100);
 
       if (activeWall != previousWall) //new activity
       {
         Serial.println("activeWall != previousWall");
-        delay(100);
         if (activeWall == "S")
         {
           calculateTime();
@@ -399,6 +393,14 @@ void loop(void)
 
           writeDataToFram(activeWall, startOfActDate, startOfActTime, activityDuration);
 
+          String numOFREcords = framReadNumber();
+          Serial.println("records string: " + numOFREcords);
+          numberOfRecords = numOFREcords.toInt();
+          Serial.println("records int: " + numberOfRecords);
+          numberOfRecords += 1;
+          showFram();
+          framWriteNumber(String(numberOfRecords));
+          showFram();
           /*
         TO DO
         */
@@ -425,9 +427,8 @@ void loop(void)
           writeDataToFram(activeWall, startOfActDate, startOfActTime, activityDuration);
           numOFRecords += 1;
           showFram();
-          delay(15000);
           framWriteNumber(String(numOFRecords));
-          delay(15000);
+          showFram();
           startCounting();
           sleep(millis());
         }
