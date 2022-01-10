@@ -351,7 +351,8 @@ void loop(void)
     String numOFREcords = framReadNumber();
     Serial.println("num of records string in motion detect: " + numOFREcords);
     numberOfRecords = numOFREcords.toInt();
-    Serial.println("num of records int in motion detect: " + numberOfRecords);
+    Serial.println("num of records int 1 in motion detect: " + numberOfRecords);
+    Serial.println("num of records int in motion detect: " + String(int(numberOfRecords)));
 
     Serial.println("activeWall after motion: " + activeWall);
 
