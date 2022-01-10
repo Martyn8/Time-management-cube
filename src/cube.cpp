@@ -93,7 +93,6 @@ void sleep(unsigned long time)
         pinMode(WAKE_HIGH_PIN, INPUT_PULLDOWN_SENSE);
 
         //   calculateTime();
-        activeWall = "";
 
         //   writeDataToFram(startOfActDate, startOfActTime, activityDuration);
 
@@ -123,6 +122,9 @@ void sleep(unsigned long time)
         // */
         showFram();
         Serial.println("deep sleep");
+        activeWall = "";
+        framWriteActiveWall(activeWall);
+        Serial.println("wrote active wall to fram ");
         delay(1000);
 
         sd_power_system_off(); // power down nrf52
@@ -143,6 +145,10 @@ void sleep(unsigned long time)
         pinMode(WAKE_HIGH_PIN, INPUT_PULLDOWN_SENSE);
         delay(100);
         Serial.println("light sleep");
+        delay(100);
+        framWriteActiveWall(activeWall);
+        delay(100);
+        Serial.println("wrote active wall to fram ");
         delay(100);
         sd_power_system_off(); // power down nrf52
       }
@@ -303,7 +309,10 @@ void setup(void)
     fram.writeEnable(true);
     //uint8_t values[2] = {48, 48};
     //fram.write(1, values, sizeof(values) / sizeof(*values));
+    //resetFram();
+    //Serial.println("reset SPI FRAM");
     showFram();
+    Serial.println("show SPI FRAM setup");
     fram.writeEnable(false);
   }
   else
@@ -337,6 +346,13 @@ void loop(void)
 
     accelRead();
 
+    activeWall = framReadActiveWall();
+
+    String numOFREcords = framReadNumber();
+    Serial.println("num of records string in motion detect: " + numOFREcords);
+    numberOfRecords = numOFREcords.toInt();
+    Serial.println("num of records int in motion detect: " + numberOfRecords);
+
     Serial.println("activeWall after motion: " + activeWall);
 
     if (activeWall.length() == 0)
@@ -362,10 +378,12 @@ void loop(void)
       }
       else if (activeWall == "undefined")
       {
+        //wait for motion detect
       }
-      else
+      else // if wall num is 1-5
       {
         startCounting();
+        writeDataToFram(activeWall, startOfActDate, startOfActTime, activityDuration);
         //Serial.println(startOfActDate);
         //Serial.println(startOfActTime);
         sleep(millis());
@@ -374,6 +392,11 @@ void loop(void)
     else
     {
       //if cube was active but wall was changed
+
+      //bicz mejbi rid that dejta?????????????
+
+      startOfActDate = framReadDate();
+      startOfActTime = framReadActStart();
 
       Serial.println("is startOfActDate correct after light sleep : " + startOfActDate);
       Serial.println("is startOfActTime correct after light sleep : " + startOfActTime);
@@ -385,7 +408,7 @@ void loop(void)
       if (activeWall != previousWall) //new activity
       {
         Serial.println("activeWall != previousWall");
-        if (activeWall == "S")
+        if (activeWall == "S") //new wall is "S" wall
         {
           calculateTime();
           Serial.println(" new S wall - startOfActDate " + startOfActDate);
@@ -393,11 +416,8 @@ void loop(void)
 
           writeDataToFram(activeWall, startOfActDate, startOfActTime, activityDuration);
 
-          String numOFREcords = framReadNumber();
-          Serial.println("records string: " + numOFREcords);
-          numberOfRecords = numOFREcords.toInt();
-          Serial.println("records int: " + numberOfRecords);
           numberOfRecords += 1;
+          Serial.println("num of rec after writing dur" + numberOfRecords);
           showFram();
           framWriteNumber(String(numberOfRecords));
           showFram();
@@ -413,8 +433,9 @@ void loop(void)
         }
         else if (activeWall == "undefined")
         {
+          //wait for motion detect
         }
-        else
+        else //active wall is 1-5 wall
         {
           calculateTime();
           Serial.println(" new wall - startOfActDate " + startOfActDate);
@@ -426,10 +447,13 @@ void loop(void)
 
           writeDataToFram(activeWall, startOfActDate, startOfActTime, activityDuration);
           numOFRecords += 1;
+          Serial.println("num of rec after writing dur" + numberOfRecords);
+          Serial.println("num of rec string after writing dur" + String(numberOfRecords));
           showFram();
           framWriteNumber(String(numOFRecords));
           showFram();
           startCounting();
+
           sleep(millis());
         }
       }

@@ -29,12 +29,15 @@ extern uint8_t FRAM_MOS;
 extern Adafruit_FRAM_SPI fram;
 
 extern uint16_t addrNum;
+extern uint16_t addrActiveWall;
 extern uint16_t addrWall;
 extern uint16_t addrDate;
 extern uint16_t addrStart;
 extern uint16_t addrDur;
 
 void framWriteNumber(String numberOfRecords);
+
+void framWriteActiveWall(String wallNumber);
 
 void framWriteWall(String wallNumber);
 
@@ -46,6 +49,8 @@ void framWriteDuration(DateTime activityDuration);
 
 String framReadNumber();
 
+String framReadActiveWall();
+
 String framReadWall();
 
 String framReadDate();
@@ -55,6 +60,8 @@ String framReadActStart();
 String framReadDuration();
 
 void showFram();
+
+void resetFram();
 
 void writeDataToFram(String activeWall, String startOfActDate, String startOfActTime, DateTime activityDuration);
 
