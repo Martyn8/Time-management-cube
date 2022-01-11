@@ -270,13 +270,17 @@ void setup(void)
   else
   {
     Serial.println("Found RTC");
-    //rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
   }
 
-  if (!rtc.isrunning())
+  if (rtc.lostPower())
   {
-    Serial.println("RTC is NOT running, let's set the time!");
+    Serial.println("RTC lost power, let's set the time!");
+    // When time needs to be set on a new device, or after a power loss, the
+    // following line sets the RTC to the date & time this sketch was compiled
     rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
+    // This line sets the RTC with an explicit date & time, for example to set
+    // January 21, 2014 at 3am you would call:
+    // rtc.adjust(DateTime(2014, 1, 21, 3, 0, 0));
   }
 
   //FRAM setup
@@ -286,7 +290,7 @@ void setup(void)
     fram.writeEnable(true);
     //uint8_t values[2] = {48, 48};
     //fram.write(1, values, sizeof(values) / sizeof(*values));
-    //resetFram();
+    resetFram();
     //Serial.println("reset SPI FRAM");
     showFram();
     Serial.println("show SPI FRAM setup");
