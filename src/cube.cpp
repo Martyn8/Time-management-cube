@@ -92,34 +92,6 @@ void sleep(unsigned long time)
         //   //pinMode(WAKE_LOW_PIN,  INPUT_PULLUP_SENSE);
         pinMode(WAKE_HIGH_PIN, INPUT_PULLDOWN_SENSE);
 
-        //   calculateTime();
-
-        //   writeDataToFram(startOfActDate, startOfActTime, activityDuration);
-
-        //   delay(1000);
-        //   Serial.println(startOfActDate + "\n");
-        //   Serial.println(startOfActTime + "\n");
-        //   char buff[] = "hh:mm:ss";
-        //   Serial.println(activityDuration.toString(buff));
-
-        //   //showFram();
-
-        //   showFram();
-
-        //   Serial.println("\n");
-        //   String readDate = framReadDate();
-        //   Serial.println("fromm sleep - Date: " + readDate + "\n");
-
-        //   String readTime = framReadActStart();
-        //   Serial.println("fromm sleep - Time: " + readTime + "\n");
-
-        //   String readDur = framReadDuration();
-        //   Serial.println("fromm sleep - Duration: " + readDur + "\n");
-
-        //   /*
-        //    this function puts the whole nRF52 to deep sleep (no Bluetooth).
-        //    If no sense pins are setup (or other hardware interrupts), the nrf52 will not wake up.
-        // */
         showFram();
         Serial.println("deep sleep");
         activeWall = "";
@@ -145,10 +117,10 @@ void sleep(unsigned long time)
         pinMode(WAKE_HIGH_PIN, INPUT_PULLDOWN_SENSE);
         delay(100);
         Serial.println("light sleep");
-        delay(100);
-        framWriteActiveWall(activeWall);
-        delay(100);
-        Serial.println("wrote active wall to fram ");
+        //delay(100);
+        //framWriteActiveWall(activeWall);
+        //delay(100);
+        //Serial.println("wrote active wall to fram ");
         delay(100);
         sd_power_system_off(); // power down nrf52
       }
@@ -295,6 +267,11 @@ void setup(void)
     Serial.flush();
     abort();
   }
+  else
+  {
+    Serial.println("Found RTC");
+    //rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
+  }
 
   if (!rtc.isrunning())
   {
@@ -347,17 +324,19 @@ void loop(void)
     accelRead();
 
     activeWall = framReadActiveWall();
+    Serial.println("activeWall after motion: " + activeWall);
+    delay(100);
 
     String numOFREcords = framReadNumber();
-    Serial.println("num of records string in motion detect: " + numOFREcords);
+    Serial.println("numOFREcords string in motion detect: " + numOFREcords);
+    delay(100);
     numberOfRecords = numOFREcords.toInt();
-    Serial.println("num of records int 1 in motion detect: " + numberOfRecords);
-    Serial.println("num of records int in motion detect: " + String(int(numberOfRecords)));
-
-    Serial.println("activeWall after motion: " + activeWall);
+    Serial.println("numberOfRecords string in motion detect: " + String(numberOfRecords));
 
     if (activeWall.length() == 0)
     {
+      Serial.println("\n\nFIRST TIME WAKE UP\n");
+
       //if cube was in deep sleep (on "S" wall)
       //set activeWall for the first time and start counting or go to sleep if it is "S" wall
 
@@ -384,9 +363,17 @@ void loop(void)
       else // if wall num is 1-5
       {
         startCounting();
-        writeDataToFram(activeWall, startOfActDate, startOfActTime, activityDuration);
-        //Serial.println(startOfActDate);
-        //Serial.println(startOfActTime);
+        //writeDataToFram(activeWall, startOfActDate, startOfActTime, activityDuration);
+        Serial.println(" first time - startOfActDate " + startOfActDate);
+        Serial.println(" first time - startOfActTime " + startOfActTime);
+        framWriteActiveWall(activeWall);
+        framWriteWall(activeWall);
+        framWriteDate(startOfActDate);
+        framWriteActStart(startOfActTime);
+
+        Serial.println("\nFRAM AFTER START COUNT FOR FIRST TIME");
+        showFram();
+        Serial.println("\n");
         sleep(millis());
       }
     }
@@ -443,18 +430,33 @@ void loop(void)
           Serial.println(" new wall - startOfActTime " + startOfActTime);
           String numOFREcords = framReadNumber();
           Serial.println("records string: " + numOFREcords);
-          int numOFRecords = numOFREcords.toInt();
-          Serial.println("records int: " + numOFRecords);
+          numberOfRecords = numOFREcords.toInt();
+          Serial.println("numberOfRecords: " + String(numberOfRecords));
 
-          writeDataToFram(activeWall, startOfActDate, startOfActTime, activityDuration);
-          numOFRecords += 1;
-          Serial.println("num of rec after writing dur" + numberOfRecords);
-          Serial.println("num of rec string after writing dur" + String(numberOfRecords));
+          //writeDataToFram(activeWall, startOfActDate, startOfActTime, activityDuration);
+          framWriteDuration(activityDuration);
+
+          delay(2000);
+          numberOfRecords++;
+          Serial.println("num of rec string after writing dur " + String(numberOfRecords));
+          delay(1000);
           showFram();
-          framWriteNumber(String(numOFRecords));
+          framWriteNumber(String(numberOfRecords));
+          Serial.println("NUM oF REC +1 TO FRAM\n");
+          delay(1000);
           showFram();
           startCounting();
-
+          Serial.println("STARTTED COUNTING\n");
+          //writeDataToFram(activeWall, startOfActDate, startOfActTime, activityDuration);
+          framWriteActiveWall(activeWall);
+          framWriteWall(activeWall);
+          framWriteDate(startOfActDate);
+          framWriteActStart(startOfActTime);
+          delay(1000);
+          Serial.println("WROTE NEW ACT TO FRAM?????????????????????\n");
+          delay(1000);
+          showFram();
+          delay(1000);
           sleep(millis());
         }
       }

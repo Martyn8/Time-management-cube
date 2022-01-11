@@ -31,13 +31,13 @@ void accelRead(void)
   gyro_y = gyro.gyro.y;
   gyro_z = gyro.gyro.z;
 
-  Serial.print("Acceleration: ");
-  Serial.print(accel_x);
-  Serial.print(" ");
-  Serial.print(accel_y);
-  Serial.print(" ");
-  Serial.print(accel_z);
-  Serial.println(" m/s^2");
+  // Serial.print("Acceleration: ");
+  // Serial.print(accel_x);
+  // Serial.print(" ");
+  // Serial.print(accel_y);
+  // Serial.print(" ");
+  // Serial.print(accel_z);
+  // Serial.println(" m/s^2");
 
   // if ((millis() - lastTime) > accelReadDelay)
   // {
