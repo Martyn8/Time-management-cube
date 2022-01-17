@@ -57,7 +57,7 @@ void sendDataToDevice()
 
   Serial.println("DATA: " + DATA);
 
-  DATA += "ENDEND";
+  DATA += "END";
 
   char charBuf[DATA.length() + 1];
 
@@ -74,6 +74,8 @@ void sendDataToDevice()
     Serial.println("data has been sent");
 
     resetFram();
+
+    showFram();
   }
   else
     Serial.println("IS_NOT_CONNECTED");
