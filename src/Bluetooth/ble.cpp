@@ -5,6 +5,8 @@ BLEDis bledis;   // device information
 BLEUart bleuart; // uart over ble
 BLEBas blebas;   // battery
 
+bool IS_CONNECTED;
+
 /********************************************************BLUETOOTH**************************************************************/
 
 /*
@@ -43,6 +45,9 @@ void connect_callback(uint16_t conn_handle)
 {
     // Get the reference to current connection
     BLEConnection *connection = Bluefruit.Connection(conn_handle);
+
+    IS_CONNECTED = connection->connected();
+    Serial.print("IS_CONNECTED - " + String(IS_CONNECTED));
 
     char central_name[32] = {0};
     connection->getPeerName(central_name, sizeof(central_name));

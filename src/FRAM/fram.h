@@ -8,13 +8,6 @@
 
 #include "RTClib.h"
 
-#define ALL_LENGTH = 31;
-#define NUMBER_LENGTH ;
-#define WALL_LENGTH ;
-#define DATA_LENGTH ;
-#define START_LENGTH ;
-#define DUR_LENGTH ;
-
 extern uint8_t numberOfRecords;
 
 // /******FRAM******/
@@ -51,13 +44,13 @@ String framReadNumber();
 
 String framReadActiveWall();
 
-String framReadWall();
+String framReadWall(uint8_t record);
 
-String framReadDate();
+String framReadDate(uint8_t record);
 
-String framReadActStart();
+String framReadActStart(uint8_t record);
 
-String framReadDuration();
+String framReadDuration(uint8_t record);
 
 void showFram();
 

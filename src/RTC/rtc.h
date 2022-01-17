@@ -6,7 +6,7 @@
 
 
 
-extern RTC_DS1307 rtc;
+extern RTC_DS3231 rtc;
 
 /*
  * Variables holding readings from the RTC 

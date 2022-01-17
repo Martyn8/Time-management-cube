@@ -8,6 +8,8 @@ extern BLEDis bledis;   // device information
 extern BLEUart bleuart; // uart over ble
 extern BLEBas blebas;   // battery
 
+extern bool IS_CONNECTED;
+
 /********************************************************BLUETOOTH**************************************************************/
 
 /*

@@ -8,10 +8,6 @@ Adafruit_LSM6DS33 lsm6ds33; // accelerometer, gyroscope
 String activeWall = "";
 
 float accel_x, accel_y, accel_z;
-float gyro_x, gyro_y, gyro_z;
-
-unsigned long lastTime = 0;
-const unsigned long accelReadDelay = 1000;
 
 /**************************************************ACCELEROMETER*****************************************************/
 /*
@@ -27,9 +23,6 @@ void accelRead(void)
   accel_x = accel.acceleration.x;
   accel_y = accel.acceleration.y;
   accel_z = accel.acceleration.z;
-  gyro_x = gyro.gyro.x;
-  gyro_y = gyro.gyro.y;
-  gyro_z = gyro.gyro.z;
 
   // Serial.print("Acceleration: ");
   // Serial.print(accel_x);

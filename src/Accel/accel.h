@@ -11,10 +11,7 @@ extern Adafruit_LSM6DS33 lsm6ds33; // accelerometer, gyroscope
 extern String activeWall;
 
 extern float accel_x, accel_y, accel_z;
-extern float gyro_x, gyro_y, gyro_z;
 
-extern unsigned long lastTime;
-extern const unsigned long accelReadDelay;
 
 /**************************************************ACCELEROMETER*****************************************************/
 /*

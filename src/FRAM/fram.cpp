@@ -38,7 +38,7 @@ void framWriteNumber(String numberOfRecords)
     fram.writeEnable(false);
 
     //  // Keep track of what address to write to
-    int writeToAddr;
+    int writeToAddr = addrNum + 1;
     //
     for (uint8_t i = 0; i < stringLength; i++)
     {
@@ -48,7 +48,7 @@ void framWriteNumber(String numberOfRecords)
         fram.writeEnable(false);
     }
     Serial.println("wrote number of records to fram, and addr :" + String(writeToAddr));
-    //showFram();
+    showFram();
 }
 
 /*
@@ -69,7 +69,7 @@ void framWriteActiveWall(String wallNumber)
     fram.writeEnable(false);
 
     //  // Keep track of what address to write to
-    int writeToAddr;
+    int writeToAddr = addrActiveWall + 1;
     //
     for (uint8_t i = 0; i < stringLength; i++)
     {
@@ -80,7 +80,7 @@ void framWriteActiveWall(String wallNumber)
     }
     delay(100);
     Serial.println("wrote number of an active wall to fram, to addr: " + String(writeToAddr));
-    //showFram();
+    showFram();
 }
 
 /*
@@ -115,7 +115,7 @@ void framWriteWall(String wallNumber)
 
     delay(100);
     Serial.println("wrote number of a wall to fram, to addr " + String(addrWall));
-    //showFram();
+    showFram();
 }
 
 /*
@@ -151,7 +151,7 @@ void framWriteDate(String startOfActDate)
         fram.writeEnable(false);
     }
     Serial.println("wrote date to fram to addr" + String(addrDate));
-    //showFram();
+    showFram();
 }
 
 /*
@@ -184,7 +184,7 @@ void framWriteActStart(String startOfActTime)
         delay(50);
     }
     Serial.println("wrote act start to fram, to addr" + String(addrStart));
-    //showFram();
+    showFram();
 }
 
 /*
@@ -220,7 +220,7 @@ void framWriteDuration(DateTime activityDuration)
         delay(50);
     }
     Serial.println("wrote duration to fram, to addr " + String(addrDur));
-    //showFram();
+    showFram();
 }
 
 /*
@@ -245,8 +245,8 @@ String framReadNumber()
         chardata = fram.read8(a);
         dataout.concat(chardata);
     }
-    //Serial.println("read number of records from fram, last addr " + String(lastaddr));
-    //Serial.println("dataout " + dataout);
+    Serial.println("read number of records from fram, last addr " + String(lastaddr));
+    Serial.println("dataout " + dataout);
     return dataout;
 }
 
@@ -268,67 +268,67 @@ String framReadActiveWall()
         chardata = fram.read8(a);
         dataout.concat(chardata);
     }
-    //Serial.println("read number of a wall from fram, last addr " + String(lastaddr));
-    //Serial.println("dataout " + dataout);
+    Serial.println("read number of a wall from fram, last addr " + String(lastaddr));
+    Serial.println("dataout " + dataout);
     return dataout;
 }
 
 /*
  * Function responsible for reading the wall from the FRAM memory.
  */
-String framReadWall()
+String framReadWall(uint8_t record)
 {
     Serial.println("\nREAD WALL");
-    uint8_t charlen = fram.read8(addrWall + 31 * int(numberOfRecords));
+    uint8_t charlen = fram.read8(addrWall + 31 * record);
 
     char chardata;
     String dataout = String("");
 
-    int lastaddr = addrWall + charlen + 31 * numberOfRecords;
+    int lastaddr = addrWall + charlen + 31 * record;
 
-    for (int a = addrWall + 1 + 31 * numberOfRecords; a <= lastaddr; a += 1)
+    for (int a = addrWall + 1 + 31 * record; a <= lastaddr; a += 1)
     {
         chardata = fram.read8(a);
         dataout.concat(chardata);
     }
-    //Serial.println("read number of a wall from fram, last addr " + String(lastaddr));
-    //Serial.println("dataout " + dataout);
+    Serial.println("read number of a wall from fram, last addr " + String(lastaddr));
+    Serial.println("dataout " + dataout);
     return dataout;
 }
 
 /*
  * Function responsible for reading the activity start date from the FRAM memory.
  */
-String framReadDate()
+String framReadDate(uint8_t record)
 {
     Serial.println("\nREAD DATE");
-    uint8_t charlen = fram.read8(addrDate + 31 * int(numberOfRecords));
+    uint8_t charlen = fram.read8(addrDate + 31 * int(record));
 
     char chardata;
     String dataout = String("");
 
-    int lastaddr = addrDate + charlen + 31 * numberOfRecords;
+    int lastaddr = addrDate + charlen + 31 * record;
 
-    for (int a = addrDate + 1 + 31 * numberOfRecords; a <= lastaddr; a += 1)
+    for (int a = addrDate + 1 + 31 * record; a <= lastaddr; a += 1)
     {
         chardata = fram.read8(a);
         dataout.concat(chardata);
     }
-    //Serial.println("read date from fram, last addr " + String(lastaddr));
-    //Serial.println("dataout " + dataout);
+    Serial.println("read date from fram, last addr " + String(lastaddr));
+    Serial.println("dataout " + dataout);
     return dataout;
 }
 
 /*
  * Function responsible for reading the activity start time from the FRAM memory.
  */
-String framReadActStart()
+String framReadActStart(uint8_t record)
 {
     Serial.println("\nREAD ACT START");
-    uint8_t charlen = fram.read8(addrStart + 31 * int(numberOfRecords));
-    int fak = int(addrStart) + 31 * int(numberOfRecords);
+    uint8_t charlen = fram.read8(addrStart + 31 * int(record));
+    int fak = int(addrStart) + 31 * int(record);
     Serial.println("fak " + String(fak));
-    Serial.println("Num of records string " + String(numberOfRecords));
+    Serial.println("Num of records string " + String(record));
     Serial.println("charlen string " + String(charlen));
 
     //Serial.println("Num of records int" + int(numberOfRecords));
@@ -337,19 +337,18 @@ String framReadActStart()
     char chardata;
     String dataout = String("");
 
-    int lastaddr = addrStart + charlen + 31 * numberOfRecords;
+    int lastaddr = addrStart + charlen + 31 * record;
     Serial.println("lastaddr " + String(lastaddr));
-    delay(1000);
-    Serial.println("addrStart" + String(addrStart + 31 * numberOfRecords));
-    delay(1000);
+    delay(100);
+    Serial.println("addrStart" + String(addrStart + 31 * record));
+    delay(100);
     // Serial.println("meh");
     // delay(1000);
 
-    for (int a = addrStart + 1 + 31 * numberOfRecords; a <= lastaddr; a += 1)
+    for (int a = addrStart + 1 + 31 * record; a <= lastaddr; a += 1)
     {
         chardata = fram.read8(a);
         dataout.concat(chardata);
-        delay(1000);
     }
     Serial.println("read act start from fram, last addr " + String(lastaddr));
     Serial.println("dataout " + dataout);
@@ -359,18 +358,18 @@ String framReadActStart()
 /*
  * Function responsible for reading the duration of an activity from the FRAM memory. 
  */
-String framReadDuration()
+String framReadDuration(uint8_t record)
 {
     Serial.println("\nREAD DURATION");
-    uint8_t charlen = fram.read8(addrDur + 31 * int(numberOfRecords));
-    ;
+    uint8_t charlen = fram.read8(addrDur + 31 * int(record));
+    Serial.println("addrdur: " + addrDur);
 
     char chardata;
     String dataout = String("");
 
-    int lastaddr = addrDur + charlen + 31 * numberOfRecords;
+    int lastaddr = addrDur + charlen + 31 * record;
 
-    for (int a = addrDur + 1 + 31 * numberOfRecords; a <= lastaddr; a += 1)
+    for (int a = addrDur + 1 + 31 * record; a < lastaddr; a += 1)
     {
         chardata = fram.read8(a);
         dataout.concat(chardata);
