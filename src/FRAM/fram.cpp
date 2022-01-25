@@ -181,7 +181,6 @@ void framWriteActStart(String startOfActTime)
         fram.writeEnable(true);
         fram.write8(writeToAddr, startOfActTime[i]);
         fram.writeEnable(false);
-        delay(50);
     }
     Serial.println("wrote act start to fram, to addr" + String(addrStart));
     showFram();
@@ -217,7 +216,7 @@ void framWriteDuration(DateTime activityDuration)
         fram.writeEnable(true);
         fram.write8(writeToAddr, buff[i]);
         fram.writeEnable(false);
-        delay(50);
+        //delay(50);
     }
     Serial.println("wrote duration to fram, to addr " + String(addrDur));
     showFram();
@@ -360,9 +359,13 @@ String framReadActStart(uint8_t record)
  */
 String framReadDuration(uint8_t record)
 {
+    addrDur = 0x1b;
     Serial.println("\nREAD DURATION");
+    delay(1000);
     uint8_t charlen = fram.read8(addrDur + 31 * int(record));
-    Serial.println("addrdur: " + addrDur);
+    delay(1000);
+    Serial.println("addrdur: " + String(addrDur));
+    delay(1000);
 
     char chardata;
     String dataout = String("");
@@ -374,6 +377,7 @@ String framReadDuration(uint8_t record)
         chardata = fram.read8(a);
         dataout.concat(chardata);
     }
+    Serial.println("record" + String(record));
     Serial.println("read duration from fram, last addr " + String(lastaddr));
     Serial.println("dataout " + dataout);
     return dataout;

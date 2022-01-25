@@ -1,11 +1,8 @@
 #include <Arduino.h>
 
-#include <Adafruit_LittleFS.h>
-#include <InternalFileSystem.h>
-
 #include <Adafruit_Sensor.h>
 
-#include <Adafruit_TinyUSB.h> // for Serial
+//#include <Adafruit_TinyUSB.h> // for Serial
 
 #include "FRAM\fram.h"
 #include "RTC\rtc.h"
@@ -109,7 +106,7 @@ void sleep(unsigned long time)
         activeWall = "";
         framWriteActiveWall(activeWall);
         //Serial.println("wrote active wall to fram ");
-        delay(1000);
+        delay(100);
 
         sd_power_system_off(); // power down nrf52
       }
@@ -123,8 +120,8 @@ void sleep(unsigned long time)
       if (((millis() - time) > SLEEPING_DELAY))
       {
         //Serial.println(" go light zzz");
-        digitalWrite(LED_BUILTIN, LOW);
-        delay(500);
+        //digitalWrite(LED_BUILTIN, LOW);
+        //delay(500);
 
         pinMode(WAKE_HIGH_PIN, INPUT_PULLDOWN_SENSE);
         delay(100);
@@ -237,7 +234,7 @@ void setup(void)
 
   pinMode(LED_BUILTIN, OUTPUT);
 
-  digitalWrite(LED_BUILTIN, HIGH);
+  //digitalWrite(LED_BUILTIN, HIGH);
   // digitalWrite(LED_BUILTIN, LOW);
   // delay(500);
   // digitalWrite(LED_BUILTIN, HIGH);
@@ -316,12 +313,12 @@ void loop(void)
 
     digitalWrite(LED_BUILTIN, HIGH);
 
-    delay(500);
+    //delay(500);
 
-    digitalWrite(LED_BUILTIN, LOW);
-    delay(500);
+    //digitalWrite(LED_BUILTIN, LOW);
+    // delay(500);
 
-    digitalWrite(LED_BUILTIN, HIGH);
+    //digitalWrite(LED_BUILTIN, HIGH);
 
     accelRead();
 
@@ -433,14 +430,14 @@ void loop(void)
           //writeDataToFram(activeWall, startOfActDate, startOfActTime, activityDuration);
           framWriteDuration(activityDuration);
 
-          delay(2000);
+          //delay(100);
           numberOfRecords++;
           Serial.println("num of rec string after writing dur " + String(numberOfRecords));
-          delay(1000);
+          delay(100);
           showFram();
           framWriteNumber(String(numberOfRecords));
           Serial.println("NUM oF REC +1 TO FRAM\n");
-          delay(1000);
+          delay(100);
           showFram();
           startCounting();
           Serial.println("STARTTED COUNTING\n");
